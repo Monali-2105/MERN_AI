@@ -7,13 +7,14 @@ import { useState } from 'react';
 import axios from '../../utils/axios';
 import { useContext } from 'react';
 import { AuthContext } from '../../utils/AuthContext';
+import { useEffect } from 'react';
 
 const Dashboard = () => {
     const [uploadFiletext, setUploadFileText] = useState("Upload your resume");
     const [loading, setLoading] = useState(false);
     const [resumeFile, setResumeFile] = useState(null);
     const [jobDesc, setJobDesc] = useState("");
-
+    const [loader, setLoader] = useState(false);
     const [result, setResult] = useState(null);
 
     const { userInfo } = useContext(AuthContext);
@@ -23,12 +24,15 @@ const Dashboard = () => {
         setUploadFileText(e.target.files[0].name)
     }
 
+
     const handleUpload = async () => {
+
         setResult(null);
         if (!resumeFile || !jobDesc) {
             alert("Please upload resume and paste job description");
             return;
         }
+        setLoading(true);
         const formData = new FormData();
         formData.append("resume", resumeFile);
         formData.append("job_desc", jobDesc);
@@ -40,9 +44,12 @@ const Dashboard = () => {
                     'Content-Type': 'multipart/form-data'
                 }
             });
+
             setResult(result.data);
-        }catch (err) {
+        } catch (err) {
             console.log(err);
+        } finally {
+            setLoading(false);
         }
 
     }
@@ -71,9 +78,15 @@ const Dashboard = () => {
                 </div>
 
                 <div className={styles.jobDesc}>
-                    <textarea value={jobDesc} onChange={(e) => { setJobDesc(e.target.value) }} className={styles.textArea} 
-                    placeholder='Paste Your Job Description' rows={10} cols={50} />
-                    <div className={styles.AnalyzeBtn} onClick={handleUpload} >Analyze</div>
+                    <textarea value={jobDesc} onChange={(e) => { setJobDesc(e.target.value) }} className={styles.textArea}
+                        placeholder='Paste Your Job Description' rows={10} cols={50} />
+                    <div
+                        className={styles.AnalyzeBtn}
+                        onClick={handleUpload}
+                        style={{ pointerEvents: loading ? "none" : "auto", opacity: loading ? 0.6 : 1 }}
+                    >
+                        {loading ? "Analyzing..." : "Analyze"}
+                    </div>
                 </div>
             </div>
 
@@ -87,11 +100,19 @@ const Dashboard = () => {
                 </div>
 
 
-                {
-                    result && <div className={styles.DashboardRightTopCard}>
-                        <div>Result</div>
+                {loading && (
+                    <Skeleton
+                        variant="rectangular"
+                        width={266}
+                        height={400}
+                        sx={{ borderRadius: "20px" }}
+                    />
+                )}
 
-                    <div style={{ display:"flex", justifyContent: "center", alignItems: "center", gap: 20 }}>
+                {!loading && result && <div className={styles.DashboardRightTopCard}>
+                    <div>Result</div>
+
+                    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 20 }}>
                         <h1>{result?.data?.score}%</h1>
                         <CreditScoreIcon sx={{ fontSize: 22 }} />
                     </div>
@@ -101,7 +122,7 @@ const Dashboard = () => {
                         <p>{result?.data?.feedback}</p>
                     </div>
 
-                    </div>
+                </div>
                 }
 
                 {

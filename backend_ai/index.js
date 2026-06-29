@@ -10,9 +10,10 @@ app.use(express.json());
 //app.use(cors());
 app.use(cors({
     origin: [
-      "http://localhost:5173", // Local Vite frontend
+      
       "https://mern-mtq4p72y9-monali-2105s-projects.vercel.app", // Replace with your Vercel URL
-      "https://mern-ai-phi.vercel.app"
+      "https://mern-ai-phi.vercel.app",
+      "http://localhost:5173" // Local Vite frontend
     ],
     credentials: true,
 }))

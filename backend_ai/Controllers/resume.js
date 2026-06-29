@@ -1,11 +1,12 @@
 const ResumeModel = require('../Models/resume');
+require("dotenv").config();
 const multer = require("multer");
 const pdfParse = require("pdf-parse");
 const path = require("path");
 const { CohereClient } = require("cohere-ai");
 
 const cohere = new CohereClient({
-    token: "V1goTLVIKnHqV2ETZMQ3hZ5gSRzX7Y8YNlsRAISt", 
+    token: process.env.COHERE_API_KEY, 
 });
 
 
